@@ -11,6 +11,6 @@ indicatif = { version = "0.17.2", features = ["rayon"] }
 
 # Only used for the "test commands" when validating/updating the valid-inputs list.
 [dev-dependencies]
-icu = "1.0.0"
-icu_testdata = "1.0.0"
+icu = "1.3.2"
+icu_testdata = "1.3.2"
 walkdir = "2.3.2"
