@@ -5,8 +5,8 @@ mkdir build/
 
 # Clone and build the Ocaml spec interpreter.
 # Requires ocamlbuild/opam.
-rm -rf spec/
-git clone git@github.com:WebAssembly/spec.git
+# rm -rf spec/
+# git clone git@github.com:WebAssembly/spec.git
 cd spec/interpreter/
 make
 # Version at the time of building the .wasm file.
