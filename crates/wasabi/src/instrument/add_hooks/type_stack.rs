@@ -77,7 +77,6 @@ impl TypeStack {
 
     pub fn begin(&mut self, block_ty: FunctionType) {
         for &input_ty in block_ty.inputs().iter().rev() {
-            println!("blockty: {}", block_ty);
             assert_eq!(
                 input_ty,
                 self.pop_val(),
@@ -97,7 +96,6 @@ impl TypeStack {
             "instruction expected input type, but stack top was"
         );
         for &input_ty in block_ty.inputs().iter().rev() {
-            println!("blockty: {}", block_ty);
             assert_eq!(
                 input_ty,
                 self.pop_val(),
