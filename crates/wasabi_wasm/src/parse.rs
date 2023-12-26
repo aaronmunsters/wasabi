@@ -548,7 +548,7 @@ fn parse_instr(
         wp::Call { function_index } => Call(function_index.into()),
         wp::CallIndirect { type_index, table_index, table_byte } => {
             let table_idx = if table_index != 0 { table_index } else { 0 };
-            assert!(table_byte == 0, "not sure which extension this is");
+            // assert!(table_byte == 0, "not sure which extension this is");
             CallIndirect(types.get(type_index, offset + 1)?, table_idx.into())
         }
 
