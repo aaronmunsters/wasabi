@@ -704,9 +704,9 @@ fn encode_instruction(
         Instr::TableFill(table_idx) => {
             we::Instruction::TableFill(state.map_table_idx(table_idx)?.to_u32())
         }
-        Instr::TableCopy(idx_1, idx_2) => we::Instruction::TableCopy {
-            src_table: state.map_table_idx(idx_1)?.to_u32(),
-            dst_table: state.map_table_idx(idx_2)?.to_u32(),
+        Instr::TableCopy(dst_idx, src_idx) => we::Instruction::TableCopy {
+            src_table: state.map_table_idx(src_idx)?.to_u32(),
+            dst_table: state.map_table_idx(dst_idx)?.to_u32(),
         },
         Instr::TableInit(table_idx, element_idx) => we::Instruction::TableInit {
             table: state.map_table_idx(table_idx)?.to_u32(),
