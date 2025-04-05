@@ -609,7 +609,7 @@ fn parse_instr(op: wp::Operator, offset: usize, types: &Types) -> Result<Instr, 
             table_byte,
         } => {
             let table_idx = if table_index != 0 { table_index } else { 0 };
-            assert!(table_byte == 0, "not sure which extension this is");
+            // assert!(table_byte == 0, "not sure which extension this is");
             CallIndirect(types.get(type_index, offset + 1)?, table_idx.into())
         }
 
