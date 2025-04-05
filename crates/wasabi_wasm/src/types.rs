@@ -542,7 +542,7 @@ impl<'module> TypeChecker<'module> {
     pub fn check_function(function: &Function, module: &Module) -> Result<(), TypeError> {
         if let Some(code) = function.code() {
             let mut type_checker = TypeChecker::begin_function(function, module);
-            for (instr_idx, instr) in code.body.iter().enumerate() {
+            for (instr_idx, (instr, _)) in code.body.iter().enumerate() {
                 let _instr_type_ignored = type_checker
                     .check_next_instr(instr)
                     // Add type error location information.
@@ -571,7 +571,7 @@ impl<'module> TypeChecker<'module> {
                 Vec::new(),
             );
             let mut type_checker = TypeChecker::begin_function(&pseudo_function_for_init, module);
-            for (instr_idx, instr) in init.iter().enumerate() {
+            for (instr_idx, (instr, _)) in init.iter().enumerate() {
                 let _instr_type_ignored = type_checker
                     .check_next_instr(instr)
                     // Add type error location information.

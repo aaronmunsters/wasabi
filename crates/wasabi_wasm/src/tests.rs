@@ -32,7 +32,7 @@ fn collect_all_function_types_in_test_set() {
             *type_count.entry(func.type_).or_insert(0u64) += 1;
 
             // Also collect all (easily computable) instruction types.
-            for instr in func.code().iter().flat_map(|code| &code.body) {
+            for (instr, _) in func.code().iter().flat_map(|code| &code.body) {
                 if let Some(instr_ty) = instr.simple_type() {
                     *type_count.entry(instr_ty).or_insert(0) += 1;
                 }

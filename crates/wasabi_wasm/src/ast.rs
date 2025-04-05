@@ -605,7 +605,7 @@ pub enum SectionId {
 
 /* Code. */
 
-pub type Expr = Vec<Instr>;
+pub type Expr = Vec<(Instr, usize)>;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct Memarg {
@@ -1936,7 +1936,7 @@ impl Module {
         &mut self,
         type_: FunctionType,
         locals: Vec<ValType>,
-        body: Vec<Instr>,
+        body: Vec<(Instr, usize)>,
     ) -> Idx<Function> {
         self.functions.push(Function::new(
             type_,
@@ -1964,7 +1964,7 @@ impl Module {
         &mut self,
         type_: ValType,
         mut_: Mutability,
-        init: Vec<Instr>,
+        init: Vec<(Instr, usize)>,
     ) -> Idx<Global> {
         self.globals.push(Global {
             type_: GlobalType(type_, mut_),
@@ -2033,11 +2033,11 @@ impl Function {
         }
     }
 
-    pub fn instrs(&self) -> &[Instr] {
+    pub fn instrs(&self) -> &[(Instr, usize)] {
         self.code().map(|code| code.body.as_slice()).unwrap_or(&[])
     }
 
-    pub fn instrs_mut(&mut self) -> Option<&mut Vec<Instr>> {
+    pub fn instrs_mut(&mut self) -> Option<&mut Vec<(Instr, usize)>> {
         self.code_mut().map(|code| &mut code.body)
     }
 
@@ -2045,12 +2045,12 @@ impl Function {
         self.code().map(|code| code.body.len()).unwrap_or(0)
     }
 
-    pub fn modify_instrs(&mut self, f: impl Fn(Instr) -> Vec<Instr>) {
+    pub fn modify_instrs(&mut self, f: impl Fn(Instr, usize) -> Vec<(Instr, usize)>) {
         if let Some(body) = self.instrs_mut() {
             let new_body = Vec::with_capacity(body.len());
             let old_body = ::std::mem::replace(body, new_body);
-            for instr in old_body.into_iter() {
-                body.append(&mut f(instr));
+            for (instr, usize) in old_body.into_iter() {
+                body.append(&mut f(instr, usize));
             }
         }
     }
