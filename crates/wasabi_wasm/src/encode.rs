@@ -452,7 +452,7 @@ fn encode_code(module: &Module, state: &mut EncodeState) -> Result<we::CodeSecti
                 .iter()
                 .map(|local| we::ValType::from(local.type_));
             let mut ll_function = we::Function::new_with_locals_types(ll_locals_iter);
-            for instr in &code.body {
+            for (instr, _) in &code.body {
                 ll_function.instruction(&encode_instruction(instr, state)?);
             }
             Ok(ll_function)
@@ -492,11 +492,11 @@ fn encode_and_insert_custom(
 }
 
 fn encode_single_instruction_with_end(
-    instrs: &[Instr],
+    instrs: &[(Instr, usize)],
     state: &mut EncodeState,
 ) -> Result<we::ConstExpr, EncodeError> {
     match instrs {
-        [single_instr, Instr::End] => {
+        [(single_instr, _), (Instr::End, _)] => {
             let mut instr_bytes = Vec::with_capacity(8);
             encode_instruction(single_instr, state)?.encode(&mut instr_bytes);
             Ok(we::ConstExpr::raw(instr_bytes))

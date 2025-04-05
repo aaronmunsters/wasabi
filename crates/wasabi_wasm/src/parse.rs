@@ -181,7 +181,7 @@ pub fn parse_module(bytes: &[u8]) -> Result<(Module, Offsets, ParseWarnings), Pa
                     for op in global.init_expr.get_operators_reader() {
                         // The `offset` will be slightly off, because it points to the beginning of the
                         // whole global entry, not the initialization expression.
-                        init.push(parse_instr(op?, offset, &types)?)
+                        init.push((parse_instr(op?, offset, &types)?, offset))
                     }
 
                     module.globals.push(Global::new(type_, init));
@@ -261,10 +261,10 @@ pub fn parse_module(bytes: &[u8]) -> Result<(Module, Offsets, ParseWarnings), Pa
                     let items: Vec<Expr> = match element.items {
                         wp::ElementItems::Functions(items_reader) => {
                             let mut offset_instrs = Vec::new();
-                            items_reader.into_iter().for_each(|func_idx| {
-                                if let Ok(func_idx) = func_idx {
-                                    offset_instrs.push(Instr::RefFunc(func_idx.into()));
-                                    offset_instrs.push(Instr::End)
+                            items_reader.into_iter_with_offsets().for_each(|func_idx| {
+                                if let Ok((offset, func_idx)) = func_idx {
+                                    offset_instrs.push((Instr::RefFunc(func_idx.into()), offset));
+                                    offset_instrs.push((Instr::End, offset + 1))
                                 }
                             });
                             offset_instrs.chunks(2).map(|x| x.to_vec()).collect()
@@ -281,7 +281,7 @@ pub fn parse_module(bytes: &[u8]) -> Result<(Module, Offsets, ParseWarnings), Pa
                                                 Ok(it) => it,
                                                 Err(_) => return (),
                                             };
-                                            offset_instrs.push(value)
+                                            offset_instrs.push((value, offset))
                                         }
                                     }
                                 }
@@ -301,7 +301,7 @@ pub fn parse_module(bytes: &[u8]) -> Result<(Module, Offsets, ParseWarnings), Pa
                                 offset_expr.get_operators_reader().into_iter_with_offsets()
                             {
                                 let (op, offset) = op_offset?;
-                                offset_instrs.push(parse_instr(op, offset, &types)?)
+                                offset_instrs.push((parse_instr(op, offset, &types)?, offset))
                             }
 
                             module.elements.push(Element {
@@ -344,7 +344,7 @@ pub fn parse_module(bytes: &[u8]) -> Result<(Module, Offsets, ParseWarnings), Pa
                                 offset_expr.get_operators_reader().into_iter_with_offsets()
                             {
                                 let (op, offset) = op_offset?;
-                                offset_instrs.push(parse_instr(op, offset, &types)?)
+                                offset_instrs.push((parse_instr(op, offset, &types)?, offset))
                             }
                             module.datas.push(Data {
                                 init: data.data.to_vec(),
@@ -555,7 +555,7 @@ fn parse_body(body: wp::FunctionBody, types: &Types) -> Result<Code, ParseError>
 
     for op_offset in body.get_operators_reader()?.into_iter_with_offsets() {
         let (op, offset) = op_offset?;
-        instrs.push(parse_instr(op, offset, types)?);
+        instrs.push((parse_instr(op, offset, types)?, offset));
     }
 
     Ok(Code {
